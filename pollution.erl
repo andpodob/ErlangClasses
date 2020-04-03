@@ -11,7 +11,7 @@
 
 
 %% API
--export([createMonitor/0, addStation/3, addValue/5, removeValue/4, getStationMean/3]).
+-export([createMonitor/0, addStation/3, addValue/5, removeValue/4, getStationMean/3, getOneValue/4, getDailyMean/3]).
 
 -type cords(_X,_Y) :: tuple().
 
@@ -72,7 +72,7 @@ getValues([Station|_], Type, Monitor)->
      false ->{error, "Nie zarejestrowano pomiarow na tej stacji"}
   end.
 
-addValue(NameOrCords, Monitor, Time, Type, Val)->
+addValue(NameOrCords, Time, Type, Val, Monitor)->
   addVal(getStation(NameOrCords, Monitor), Monitor, Time, Type, Val).
 
 addVal([],_,_,_,_)->{error, "Nie ma takiej stacji"};
@@ -101,6 +101,12 @@ getStationMean(NameOrCords, Type, Monitor)->
   L = getValues(getStation(NameOrCords, Monitor), Type, Monitor),
   Len = length(L),
   lists:foldl(fun(#measure{datetime = _, type = _, val = X}, Acc)->Acc + X/Len end, 0, L).
+
+getDailyMean(Type, Day, Monitor)->
+  V = lists:foldl(fun(Station, Acc)->Acc++lists:filter(fun(#measure{datetime = {D,_}, type = _, val=_}) -> D == Day end, getValues([Station], Type, Monitor)) end, [], Monitor#monitor.list),
+  L = length(V),
+  lists:foldl(fun(#measure{datetime = _, type = _, val = X}, Acc)->Acc + X/L end, 0, V).
+
 
 
 
