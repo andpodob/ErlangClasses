@@ -51,6 +51,21 @@ addStation(Name, Cords, Monitor) ->
 
 getStation(Station, Monitor)->lists:filter(fun(#station{name = N,cords = C})-> (C == Station) or (N == Station) end, Monitor#monitor.list).
 
+getOneValue(NameOrCords, Date, Type, Monitor)->
+  getOneVal(getStation(NameOrCords,Monitor), Date, Type, Monitor).
+
+getOneVal([],_,_,_)->{error, "Nie ma takiej stacji"};
+getOneVal([Station|_], Date, Type, Monitor)->
+  case dict:is_key(Station, Monitor#monitor.dict)
+    of true ->
+      case lists:filter(fun(#measure{datetime = D, type = T, val=_})->(T == Type) and (D == Date) end, dict:fetch(Station, Monitor#monitor.dict))
+        of [] -> {error, "Nie ma takiego pomiaru na tej stacji"};
+        [H|_]-> H
+        end;
+      false ->{error, "Nie zarejestrowano pomiarow na tej stacji"}
+  end.
+
+
 addValue(NameOrCords, Monitor, Time, Type, Val)->
   addVal(getStation(NameOrCords, Monitor), Monitor, Time, Type, Val).
 
