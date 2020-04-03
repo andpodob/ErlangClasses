@@ -11,7 +11,7 @@
 
 
 %% API
--export([createMonitor/0, addStation/3, addValue/5, removeValue/4]).
+-export([createMonitor/0, addStation/3, addValue/5, removeValue/4, getStationMean/3]).
 
 -type cords(_X,_Y) :: tuple().
 
@@ -65,6 +65,12 @@ getOneVal([Station|_], Date, Type, Monitor)->
       false ->{error, "Nie zarejestrowano pomiarow na tej stacji"}
   end.
 
+getValues([],_,_)->{error, "Nie ma takiej stacji"};
+getValues([Station|_], Type, Monitor)->
+  case dict:is_key(Station, Monitor#monitor.dict)
+  of true -> lists:filter(fun(#measure{datetime = D, type = T, val=_})->(T == Type) end, dict:fetch(Station, Monitor#monitor.dict));
+     false ->{error, "Nie zarejestrowano pomiarow na tej stacji"}
+  end.
 
 addValue(NameOrCords, Monitor, Time, Type, Val)->
   addVal(getStation(NameOrCords, Monitor), Monitor, Time, Type, Val).
@@ -90,6 +96,11 @@ removeVal([Station|_], Monitor, Time, Type)->
     #monitor{list = Monitor#monitor.list, dict = dict:update(Station, fun(Old)->lists:filter(fun(#measure{datetime = D, type = T, val = _})->(D=/=Time) or (T=/=Type)end, Old) end, Monitor#monitor.dict)};
     false ->{error, "Nie ma takiego pomiaru"}
   end.
+
+getStationMean(NameOrCords, Type, Monitor)->
+  L = getValues(getStation(NameOrCords, Monitor), Type, Monitor),
+  Len = length(L),
+  lists:foldl(fun(#measure{datetime = _, type = _, val = X}, Acc)->Acc + X/Len end, 0, L).
 
 
 
