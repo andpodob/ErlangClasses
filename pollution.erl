@@ -11,11 +11,13 @@
 
 
 %% API
--export([createMonitor/0, addStation/3, addValue/5, removeValue/4, getStationMean/3, getOneValue/4, getDailyMean/3]).
+-export([createMonitor/0, addStation/3, addValue/5, removeValue/4, getStationMean/3, getOneValue/4, getDailyMean/3, getStationMedian/3]).
 
 -type cords(_X,_Y) :: tuple().
 
 -type station(_Name, _Cords) :: tuple().
+
+-import(lists, [nth/2, sort/1]).
 
 -type measure(_Datetime, _Type, _Val) :: tuple().
 
@@ -108,6 +110,18 @@ getDailyMean(Type, Day, Monitor)->
   lists:foldl(fun(#measure{datetime = _, type = _, val = X}, Acc)->Acc + X/L end, 0, V).
 
 
+getStationMedian(NameOrCords,Type, Monitor)->
+  L = getValues(getStation(NameOrCords, Monitor), Type, Monitor),
+  median(lists:map(fun (#measure{datetime = _,type = _,val = V})->V  end,L)).
 
 
+
+
+
+median(Unsorted) ->
+  Sorted = sort(Unsorted),
+  Length = length(Sorted),
+  Mid = Length div 2,
+  Rem = Length rem 2,
+  (nth(Mid+Rem, Sorted) + nth(Mid+1, Sorted)) / 2.
 

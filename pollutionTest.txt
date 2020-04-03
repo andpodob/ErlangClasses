@@ -1,0 +1,21 @@
+P = pollution:createMonitor().
+P1 = pollution:addStation("Aleja Słowackiego", {50.2345, 18.3445}, P).
+P2 = pollution:addValue({50.2345, 18.3445}, {{2020,4,3},{16,18,1}}, "PM10", 59, P1).
+P3 = pollution:addValue("Aleja Słowackiego", {{2020,4,3},{16,18,1}}, "PM2,5", 113, P2).
+P4 = pollution:addValue({50.2345, 18.3445}, {{2020,5,3},{16,18,1}}, "PM10", 70, P3).
+P5 = pollution:addValue("Aleja Słowackiego", {{2020,5,3},{16,18,1}}, "PM2,5", 200, P4).
+P6 = pollution:addStation("Nowa Huta", {50.05, 20.05}, P5).
+P7 = pollution:addStation("Kraków Krowodrza", {50.05, 19.58}, P6).
+P8 = pollution:addValue("Kraków Krowodrza", {{2020,4,3},{16,18,1}}, "PM10", 59, P7).
+P9 = pollution:addValue("Kraków Krowodrza", {{2020,4,3},{16,20,1}}, "PM10", 58, P8).
+P10 = pollution:addValue("Kraków Krowodrza", {{2020,5,3},{16,22,1}}, "PM10", 76, P9).
+P11 = pollution:addValue("Kraków Krowodrza", {{2020,5,3},{16,24,1}}, "PM10", 256, P10).
+P12 = pollution:addValue("Nowa Huta", {{2020,4,3},{17,18,1}}, "PM2,5", 15, P11).
+P13 = pollution:addValue("Nowa Huta", {{2020,4,3},{17,20,1}}, "PM2,5", 100, P12).
+P14 = pollution:addValue("Nowa Huta", {{2020,5,3},{17,22,1}}, "PM2,5", 121, P13).
+P15 = pollution:addValue("Nowa Huta", {{2020,5,3},{17,24,1}}, "PM2,5", 111, P14).
+
+
+
+pollution:getStationMean("Nowa Huta", "PM2,5", P15).
+pollution:getDailyMean("PM2,5", {2020,4,3}, P15).
