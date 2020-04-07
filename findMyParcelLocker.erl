@@ -9,10 +9,10 @@
 -module(findMyParcelLocker).
 -author("andrz").
 
--define(PEOPLE, [{random:uniform()*random:uniform(1000), random:uniform()*random:uniform(1000)} || _ <- lists:seq(1, 1)]).
--define(LOCKERS, [{random:uniform()*random:uniform(1000), random:uniform()*random:uniform(1000)} || _ <- lists:seq(1, 10)]).
+-define(PEOPLE, [{random:uniform()*random:uniform(1000), random:uniform()*random:uniform(1000)} || _ <- lists:seq(1, 10000)]).
+-define(LOCKERS, [{random:uniform()*random:uniform(1000), random:uniform()*random:uniform(1000)} || _ <- lists:seq(1, 1000)]).
 %% API
--export([findMyParcelLocker/2, getLockersList/0, findForAllPeople/2,findForAllPeople/3, getPeopleList/0, findMyParcelLocker/3, findOnSubProcesses/2, findOnSubProcesses/3]).
+-export([measureTimeSeq/2, measureTimeMultiCore/3, measureTimeMultiProc/2,findMyParcelLocker/2, getLockersList/0, findForAllPeople/2,findForAllPeople/3, getPeopleList/0, findMyParcelLocker/3, findOnSubProcesses/2, findOnSubProcesses/3]).
 
 distance({X1,Y1},{X2, Y2})->math:sqrt((X1-X2)*(X1-X2)+(Y1-Y2)*(Y1-Y2)).
 
@@ -51,7 +51,7 @@ findOnSubProcesses(PeopleList, LockerList, N) ->
   Len = ceil(length(PeopleList)/N),
   SubLists = [lists:sublist(PeopleList, X, Len) || X <- lists:seq(1,length(PeopleList),Len)],
   [spawn(?MODULE, findForAllPeople,[List, LockerList, multicore]) || List <- SubLists],
-  collectResponses([], length(SubLists)).
+  collectResponses([], length(PeopleList)).
 
 collectResponses(L, Len) ->
   case Len == length(L) of true -> L ;
@@ -60,3 +60,15 @@ collectResponses(L, Len) ->
         Res -> collectResponses(L++Res, Len)
       end
     end.
+
+measureTimeSeq(PeopleList, LockerList)->
+  {T, _} = timer:tc(?MODULE,findForAllPeople, [PeopleList, LockerList]),
+  io:format("Time ~f ~n",[T/1000000]), ok.
+
+measureTimeMultiProc(PeopleList, LockerList)->
+  {T, _} = timer:tc(?MODULE,findOnSubProcesses, [PeopleList, LockerList]),
+  io:format("Time ~f ~n",[T/1000000]), ok.
+
+measureTimeMultiCore(PeopleList, LockerList,N)->
+  {T, _} = timer:tc(?MODULE,findOnSubProcesses, [PeopleList, LockerList, N]),
+  io:format("Time ~f ~n",[T/1000000]), ok.
