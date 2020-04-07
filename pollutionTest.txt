@@ -1,3 +1,7 @@
+#Poniższe wywołania można wkleić do temrinala konsoli erlanga, zbudują one niedużą bazę rekordów która pozwala
+#na wstępne przetestowanie napisanych funckji. Jako dodatkowe funkcje dopisałem dzienne maksimum ze wszystkich stacji
+#danego typu pomiaru, oraz medianę danego typu pomiaru z danej stacji ze wszystkich pomiarów.
+
 P = pollution:createMonitor().
 P1 = pollution:addStation("Aleja Słowackiego", {50.2345, 18.3445}, P).
 P2 = pollution:addValue({50.2345, 18.3445}, {{2020,4,3},{16,18,1}}, "PM10", 59, P1).
@@ -16,6 +20,7 @@ P14 = pollution:addValue("Nowa Huta", {{2020,5,3},{17,22,1}}, "PM2,5", 121, P13)
 P15 = pollution:addValue("Nowa Huta", {{2020,5,3},{17,24,1}}, "PM2,5", 111, P14).
 
 
-
+pollution:getOneValue({50.05, 20.05}, {{2020,4,3},{17,18,1}}, "PM2,5", P15).
 pollution:getStationMean("Nowa Huta", "PM2,5", P15).
 pollution:getDailyMean("PM2,5", {2020,4,3}, P15).
+pollution:getDailyMax("PM2,5", {2020,4,3}, P15).
