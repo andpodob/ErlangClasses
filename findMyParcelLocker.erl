@@ -25,11 +25,6 @@ findMyParcelLocker(PersonLocation, [H|T])->lists:foldl(fun(LockerLocation,Acc)->
                                                               false -> Acc
                                                             end end,H, T).
 
-%%findMyParcelLocker(PersonLocation, [H|T], multicore)->parent ! {PersonLocation, lists:foldl(fun(LockerLocation,Acc)->
-%%  case distance(LockerLocation, PersonLocation) < distance(Acc, PersonLocation) of
-%%    true -> LockerLocation;
-%%    false -> Acc
-%%  end end,H, T)}.
 
 findForAllPeople(PeopleList, LockerList) -> [{Person,findMyParcelLocker(Person, LockerList)} || Person <- PeopleList].
 
